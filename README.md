@@ -19,16 +19,16 @@ This ansible is being installed on minimal OS installation of RHEL/CentOS or Deb
 2. `inventory` file Specifies the grouping of the hosts/nodes of the K8 cluster. Example:
 ```
 [master]
-192.168.242.136
+192.168.242.138
 
 [node]
-192.168.242.137
-192.168.242.133
+192.168.242.139
+192.168.242.140
 
 [all-nodes]
-192.168.242.136
-192.168.242.137
-192.168.242.133
+192.168.242.138
+192.168.242.139
+192.168.242.140
 
 ```
 3. `deploy-cluster.yml` file shows the roles to be applied to each invntory group 
