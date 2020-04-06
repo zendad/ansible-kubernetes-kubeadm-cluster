@@ -1,0 +1,11 @@
+---
+# Reset Cluster if Necessary
+- name: Reset Kubernetes component
+  shell: "kubeadm reset --force"
+
+# Initalise Cluster
+- name: Init Kubernetes cluster
+  shell: |
+    kubeadm init --pod-network-cidr {{ calico_pod_network_cidr }} \
+                 --token {{ token }} \
+                 --apiserver-advertise-address {{ master_ip }}

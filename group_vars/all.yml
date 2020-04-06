@@ -1,0 +1,30 @@
+# Kubernetes
+token: q11saq.jnqzs02qxhywp03q
+master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
+docker_version: 18.09
+kubernetes_version: 1.15.5-0
+apps_namespace: dz-apps
+
+# A list of insecure registries you might need to define - comma separated
+insecure_registries: [0.0.0.0/0]
+
+# Network implementation('calico')
+network: calico
+calico_pod_network_cidr: "192.168.0.0/16"
+calico_cmd: "kubectl apply -f https://docs.projectcalico.org/v3.11/manifests/calico.yaml"
+
+# Tools for cluster Monitoring
+enable_cluster_tools: no
+
+# Default Apps to be installed on the cluster
+enable_cluster_apps: yes
+
+docker_dir: /etc/docker
+kubeadmin_config: /etc/kubernetes/admin.conf
+
+# pat package:
+k8_apt_packages:
+  - kubeadm={{ kubernetes_version }}
+  - kubelet={{ kubernetes_version }}
+  - kubectl={{ kubernetes_version }}
+  - ufw

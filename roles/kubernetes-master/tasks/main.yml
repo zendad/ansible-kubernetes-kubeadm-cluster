@@ -1,0 +1,27 @@
+---
+#  Check if kubeadm has already run
+- name: Check if kubeadm has already run
+  stat:
+    path: "/etc/kubernetes/pki/ca.key"
+  register: kubeadm_ca
+
+# Initalise Cluster
+- name: Init cluster if needed
+  include_tasks: init.yml
+  when: not kubeadm_ca.stat.exists
+  run_once: yes
+
+# Enable and check kubelet service
+- name: Enable and check kubelet service
+  systemd:
+    name: kubelet
+    daemon_reload: yes
+    state: started
+    enabled: yes
+  register: started_kubelet
+
+# Deploy Pod Network
+- name: Deploy kubernetes pod network
+  shell: |
+    export KUBECONFIG=/etc/kubernetes/admin.conf
+    {{ calico_cmd }}

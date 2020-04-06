@@ -1,0 +1,71 @@
+---
+# Install Kubernetes
+#add  Kubernetes repo
+- name: Adding Kubernetes repo
+  when: ansible_os_family == "RedHat"
+  template:
+    src: kubernetes.repo.j2
+    dest: /etc/yum.repos.d/kubernetes.repo
+    mode: 0644
+    owner: root
+    group: root
+
+# clean yum metadata cache
+- name: clean yum metadata cache
+  when: ansible_os_family == "RedHat"
+  command: yum clean metadata
+  args:
+    warn: no
+
+# Run apt=get update
+- name: Run apt-get update after Adding Docker repo
+  when: ansible_os_family == "Debian"
+  apt:
+    update_cache: yes
+
+# Add Kubernetes APT GPG key
+- name: Add Kubernetes APT GPG key
+  when: ansible_os_family == "Debian"
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+# Debian Add Kubernetes APT repository
+- name: Add Kubernetes APT repository
+  when: ansible_os_family == "Debian"
+  apt_repository:
+    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: 'kubernetes'
+
+# Run apt=get update
+- name: Run apt-get update after Adding Docker repo
+  when: ansible_os_family == "Debian"
+  apt:
+    update_cache: yes
+
+# Set SELinux in permissive mode (effectively disabling it)
+- name: Set SELinux in permissive mode
+  when: ansible_os_family == "RedHat"
+  shell:  setenforce 0 && sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+  args:
+    warn: no
+
+# Install Kubernetes RHEL/CentOS
+- name: Install kubernetes packages (RHEL/CentOS)
+  when: ansible_os_family == "RedHat"
+  command: yum install -y kubelet-{{ kubernetes_version }} kubeadm-{{ kubernetes_version }} kubectl-{{ kubernetes_version }} --disableexcludes=kubernetes
+  args:
+    warn: no
+
+# Install Kubernetes Debian/Ubuntu
+- name: Install kubernetes packages (Debian/Ubuntu)
+  when: ansible_os_family == "Debian"
+  apt:
+    pkg: "{{ k8_apt_packages}}"
+
+# Remove dependencies that are no longer required after installing kubernetes
+- name: Remove dependencies that are no longer required
+  when: ansible_os_family == "Debian"
+  apt:
+    autoremove: yes

@@ -1,0 +1,111 @@
+---
+# Install Docker On Debian Based OS
+
+# Remove  defualt docker packages if installed
+- name: Debian Remove default docker packages if installed
+  when: ansible_os_family == "Debian"
+  apt:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - docker
+    - docker-engine
+    - docker.io
+    - containerd
+    - runc
+
+# Run apt=get update
+- name: Run apt-get update
+  when: ansible_os_family == "Debian"
+  apt:
+    update_cache: yes
+
+# Install  Install OS prerequisites for Docker
+- name: Debian Install OS prerequisites for Docker
+  when: ansible_os_family == "Debian"
+  apt:
+    pkg:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg-agent
+    - software-properties-common
+
+# Add Docker GPG Key
+- name: Add Docker APT GPG key
+  when: ansible_os_family == "Debian"
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+
+# Add docker Repo
+- name: Add Docker APT repository for the correct Release
+  when: ansible_os_family == "Debian"
+  shell: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+# Run apt=get update
+- name: Run apt-get update after Adding Docker repo
+  when: ansible_os_family == "Debian"
+  apt:
+    update_cache: yes
+
+# Install docker for Debian OS
+- name: Install docker for Debian OS
+  when: ansible_os_family == "Debian"
+  apt:
+    pkg:
+    - docker-ce={{ docker_version }}
+    - docker-ce-cli={{ docker_version }}
+    - containerd.io
+
+# Remove dependencies that are no longer required after installing Docker
+- name: Remove dependencies that are no longer required
+  when: ansible_os_family == "Debian"
+  apt:
+    autoremove: yes
+
+# Install Docker On Yum/RPM Based OS
+# Remove  defualt docker packages if installed
+- name:  Remove  default docker packages if installed for (RHEL/CentOS)
+  when: ansible_os_family == "RedHat"
+  yum:
+    name:
+      - docker
+      - docker-client
+      - docker-client-latest
+      - docker-common
+      - docker-latest
+      - docker-latest-logrotate
+      - docker-logrotate
+      - docker-engine
+    state: absent
+
+# Install yum utilities
+- name: Install yum utilities for (RHEL/CentOS)
+  when: ansible_os_family == "RedHat"
+  yum:
+    name:
+      - yum-utils
+    state: present
+
+# Add YUM docker Repo
+- name: Add Docker Repo for (RHEL/CentOS)
+  when: ansible_os_family == "RedHat"
+  shell: yum-config-manager --add-repo  https://download.docker.com/linux/centos/docker-ce.repo
+
+# Handler showing how to clean yum metadata cache
+- name: yum-clean-metadata for (RHEL/CentOS)
+  when: ansible_os_family == "RedHat"
+  command: yum clean metadata
+  args:
+    warn: no
+
+# Install docker for  (RHEL/CentOS) OS
+- name: Install docker ce (RHEL/CentOS)
+  when: ansible_os_family == "RedHat"
+  yum:
+    name: 
+      - docker-ce-{{ docker_version }}*
+      - docker-ce-cli-{{ docker_version }}*
+      - containerd.io
+    state: present
+

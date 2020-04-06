@@ -1,0 +1,22 @@
+---
+#Setup Ingress Controller for the cluster
+- name: Install Ingress Controller mandatory dependencies
+  shell: |
+    export KUBECONFIG=/etc/kubernetes/admin.conf
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.30.0/deploy/static/mandatory.yaml
+
+# Add Node app
+- name: Create Install Ingress Controller Service by reading the definition from a local file
+  template: src=ingress.yml.j2 dest=/tmp/ingress-service.yml
+
+#Setup Ingress Controller for the cluster
+- name: Install Ingress Controller Service
+  shell: |
+    export KUBECONFIG=/etc/kubernetes/admin.conf
+    kubectl apply -f /tmp/ingress-service.yml
+
+# Proxy requests of different size
+- name: Install Ingress Proxy requests of different size
+  shell: |
+    export KUBECONFIG=/etc/kubernetes/admin.conf
+    kubectl patch -n ingress-nginx configmap nginx-configuration -p '{"data":{"proxy-body-size": "{{kubernetes_ingress_proxy_size}}"}}'

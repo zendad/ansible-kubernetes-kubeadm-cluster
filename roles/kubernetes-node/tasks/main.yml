@@ -1,0 +1,34 @@
+---
+#  Check if kubelet.conf exists
+- name: Check if kubelet.conf exists
+  stat:
+    path: "/etc/kubernetes/kubelet.conf"
+  register: kubelet_conf
+
+# Join to cluster if needed
+- name: Join to cluster if needed
+  include_tasks: join.yml
+  when: not kubelet_conf.stat.exists
+
+# Join to cluster if needed
+- name: Add Ingress controller for the cluster
+  include_tasks: ingress.yml
+
+
+# Enable and restart kubelet service
+- name: Enable and check kubelet service
+  systemd:
+    name: kubelet
+    daemon_reload: yes
+    state: started
+    enabled: yes
+
+# Install Default cluster tools
+- name: Install Default tools to manage cluster
+  include_tasks: cluster-tools.yml
+  when: enable_cluster_tools
+
+# Install Default cluster apps
+- name: Install Default cluster apps
+  include_tasks: cluster-apps.yml
+  when: enable_cluster_apps

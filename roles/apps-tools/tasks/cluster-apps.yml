@@ -1,0 +1,28 @@
+---
+#Setup Default Apps
+
+# Create Namaspace
+- name: Create a k8s namespace
+  shell: |
+    export KUBECONFIG=/etc/kubernetes/admin.conf
+    kubectl create ns {{ apps_namespace }} 
+
+# Add MongoDB
+- name: Create mongodb Deployment by reading the definition from a local file
+  template: src=mongodb.yml.j2 dest=/tmp/mongodb.yml
+
+# Add Node app
+- name: Create App Deployment by reading the definition from a local file
+  template: src=nodeapp.yml.j2 dest=/tmp/app.yml
+
+# Proxy requests of different size
+- name: Proxy requests of different size
+  shell: |
+    export KUBECONFIG=/etc/kubernetes/admin.conf
+    kubectl apply -f /tmp/mongodb.yml -n {{ apps_namespace }}
+
+# Set Master node as Loadbalancer
+- name: Set Master node as Loadbalancer
+  shell: |
+    export KUBECONFIG=/etc/kubernetes/admin.conf
+    kubectl apply -f /tmp/app.yml -n {{ apps_namespace }}

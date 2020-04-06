@@ -1,0 +1,26 @@
+---
+# Install docker
+- name: Install Docker 
+  include_tasks: pkg.yml
+
+# Add docker diretory needed
+- name: Create required directory for docker
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    recurse: yes
+  with_items:
+    - "{{ docker_dir }}"
+
+# Docker environment config file
+- name: Copy Docker environment config file
+  template: src=docker.j2 dest={{ docker_dir }}/daemon.json
+
+# Enable and check Docker service
+- name: Enable and check Docker service
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+  register: started_docker

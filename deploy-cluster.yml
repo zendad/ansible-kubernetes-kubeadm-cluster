@@ -1,0 +1,29 @@
+---
+# All Hosts
+- hosts: all-nodes
+  gather_facts: yes
+  become: yes
+  roles:
+    - { role: docker, tags: docker }
+    - { role: kubernetes, tags: kubernetes }
+
+# K8 Nasters
+- hosts: master
+  gather_facts: yes
+  become: yes
+  roles:
+    - { role: kubernetes-master, tags: master }
+
+# K8 Nodes
+- hosts: node
+  gather_facts: yes
+  become: yes
+  roles:
+    - { role: kubernetes-node, tags: node }
+
+# Apps + Tools
+- hosts: master
+  gather_facts: yes
+  become: yes
+  roles:
+    - { role: apps-tools, tags: apps }
