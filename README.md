@@ -45,9 +45,14 @@ kubectl patch -n ingress-nginx svc nginx-ingress-controller -p '{"spec":{"extern
 ```
 9. Helm or Yaml manifests for the cluster tools if enabled, by default this is set no, just incase the cluster does not have enough capacity to run tools, enable this and specify the tools needed
 
+
+# Kubernetes Cluster Setup Architecture Diagram
+
+![Kubernetes Cluster Setup](kubernetes_architecture.jpg)
+
 # Other Considerations
 
-# Insecure Registries
+## Insecure Registries
 If you have any insecure registries, define them in the variable and make the following change to the docker.j2 file.
 
 ```
@@ -60,11 +65,6 @@ If you have any insecure registries, define them in the variable and make the fo
 ```
 ansible-playbook -i inventory deploy-cluster.yml
 ```
-
-# Kubernetes Cluster Setup Architecture Diagram
-
-![Kubernetes Cluster Setup](kubernetes_architecture.jpg)
-
 
 # Verification
 
