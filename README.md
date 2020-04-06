@@ -39,7 +39,34 @@ Docker version is not on the list of validated versions: 19.03.8. Latest validat
 5. kubernetes Version
 6. Pod Networking  Only allows Calico
 7. Helm or Yaml manifests for the default apps if enabled, this installs a default app and its dependencies as defined in the role kubernetes master.
-8. As no Loadbalancer IP or external DNS is defined for the cluster, the `master ip` will pe used as the cluster from outside, below is the chnage made to the ingress controller:
+8. As no Loadbalancer IP or external DNS is defined for the cluster, the `master ip` will pe used as the cluster from outside, below is the change made to the ingress controller service:
+
+```
+kind: Service
+apiVersion: v1
+metadata:
+  name: ingress-nginx
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+spec:
+  externalIPs:
+    - {{ master_ip }}
+  selector:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: https
+```
+
 ```
 kubectl patch -n ingress-nginx svc nginx-ingress-controller -p '{"spec":{"externalIPs":["{{ master_ip }}"]}}'
 ```
@@ -70,8 +97,35 @@ ansible-playbook -i inventory deploy-cluster.yml
 
 ## K8 Cluster
 
+Nodes
 ```
+kubectl get no
+NAME                      STATUS     ROLES    AGE   VERSION
+server1.dereckzenda.com   Ready      <none>   18m   v1.15.5
+server2.dereckzenda.com   Ready      <none>   70m   v1.15.5
+server4.dereckzenda.com   Ready      master   70m   v1.15.5
 ```
+
+Namespaces - apps and ingress controller namespaces should show.
+```
+kubectl get ns 
+NAME              STATUS   AGE
+default           Active   69m
+dz-apps           Active   17m
+ingress-nginx     Active   44m
+kube-node-lease   Active   69m
+kube-public       Active   69m
+kube-system       Active   69m
+
+```
+
+Ingress Controller
+
+```
+kubectl get po --all-namespaces | grep  nginx-ingress-controller
+ingress-nginx    nginx-ingress-controller-7d4f8b4fbc-5jcrl                           1/1     Running             0          59m
+```
+
 ## Deployed App
 
 ## App Enviroment virables
