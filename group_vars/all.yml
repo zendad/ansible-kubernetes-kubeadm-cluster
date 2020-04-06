@@ -4,6 +4,8 @@ master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['m
 docker_version: 18.09
 kubernetes_version: 1.15.5-0
 apps_namespace: dz-apps
+mongodb_url: db.dereckzenda.io
+app_url: nodeapp.dereckzenda.io
 
 # A list of insecure registries you might need to define - comma separated
 insecure_registries: [0.0.0.0/0]

@@ -97,3 +97,21 @@ spec:
       volumes:
         - name: data
           emptyDir: {}
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: mongodb
+  namespace: dz-apps
+  labels:
+    app: mongodb
+  annotations:
+spec:
+  rules:
+  - host: "{{ mongodb_url }}"
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: mongodb
+          servicePort: mongodb
