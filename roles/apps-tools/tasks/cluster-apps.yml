@@ -15,14 +15,14 @@
 - name: Create App Deployment by reading the definition from a local file
   template: src=nodeapp.yml.j2 dest=/tmp/app.yml
 
-# Proxy requests of different size
-- name: Proxy requests of different size
+# Apply the mongodb manifests
+- name: Apply the mongodb manifests
   shell: |
     export KUBECONFIG=/etc/kubernetes/admin.conf
     kubectl apply -f /tmp/mongodb.yml -n {{ apps_namespace }}
 
-# Set Master node as Loadbalancer
-- name: Set Master node as Loadbalancer
+# Apply the app manifests
+- name: Apply the app manifests
   shell: |
     export KUBECONFIG=/etc/kubernetes/admin.conf
     kubectl apply -f /tmp/app.yml -n {{ apps_namespace }}
