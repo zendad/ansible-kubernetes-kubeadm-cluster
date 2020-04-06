@@ -14,9 +14,3 @@
   shell: |
     export KUBECONFIG=/etc/kubernetes/admin.conf
     kubectl apply -f /tmp/ingress-service.yml
-
-# Proxy requests of different size
-- name: Install Ingress Proxy requests of different size
-  shell: |
-    export KUBECONFIG=/etc/kubernetes/admin.conf
-    kubectl patch -n ingress-nginx configmap nginx-configuration -p '{"data":{"proxy-body-size": "{{kubernetes_ingress_proxy_size}}"}}'
